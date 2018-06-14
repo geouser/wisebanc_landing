@@ -55,8 +55,14 @@ jQuery(document).ready(function($) {
     $('.js-toggle-signup-form').on('click', function(event) {
         event.preventDefault();
         $('.signup-form').addClass('active');
+
+        if ( $(window).width() <= 991 ) {
+            openPopup('#modal-popup');
+        }
     });
     
+
+
 
     $(window).on('resize', function(event) {
         event.preventDefault();
@@ -141,83 +147,115 @@ jQuery(document).ready(function($) {
 
 
 
-    /*---------------------------
-                                  Form submit
-    ---------------------------*/
-    $('.ajax-form').on('submit', function(event) {
-        event.preventDefault();
-        var data = new FormData(this);
-        $(this).find('button').prop('disabled', true);
-        $.ajax({
-            url: theme.url + '/forms.php',
-            type: 'POST',
-            data: data,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function(result) {
-                if (result.status == 'ok') {
-                    openPopup('#modal-popup-ok')
-                } else {
-                    openPopup('#modal-popup-error')
+    function update_widget( from, to, display, raw ) {
+
+            var widget_id = '.' + from + to;
+
+            var fallClass = 'falling';
+            var riseClass = 'rising'
+
+            var widget = $(widget_id);
+
+            //console.log( raw );
+
+            var widgetPrice = widget.find('.price');
+            var widgetChange = widget.find('.change-price');
+            var widgetChangePt = widget.find('.cahnge-percent');
+
+            // widget price
+            var oldPrice = widgetPrice.attr('data-price');
+            var newPrice = raw[to].PRICE;
+
+            widgetPrice.attr( 'data-price', newPrice );
+            widgetPrice.text( display[to].PRICE );
+
+            if ( oldPrice ) {
+                if ( oldPrice > newPrice ) {
+                    widgetPrice.addClass(fallClass);
+                    setTimeout(function () { 
+                        widgetPrice.removeClass(fallClass);
+                    }, 1500);
+
+                } else if ( oldPrice < newPrice ) {
+                    widgetPrice.addClass(riseClass);
+                    setTimeout(function () { 
+                        widgetPrice.removeClass(riseClass);
+                    }, 1500);
                 }
-            },
-            error: function(result) {
-                openPopup('#modal-popup-error');
             }
-        }).always(function() {
-            $('form').each(function(index, el) {
-                $(this)[0].reset();
-                $(this).find('button').prop('disabled', false);
-            });
-        });
-    });
+
+            var change = display[to].CHANGEDAY;
+
+            widgetChange.text( change );
+
+            if ( raw[to].CHANGEDAY > 0 ) {
+                widgetChange.addClass( riseClass );
+                widgetChange.removeClass( fallClass );
+            } else if ( raw[to].CHANGEDAY < 0 ) {
+                widgetChange.addClass( fallClass );
+                widgetChange.removeClass( riseClass );
+            } else {
+                widgetChange.removeClass( fallClass );
+                widgetChange.removeClass( riseClass );
+            }
+
+            widgetChangePt.text( display[to].CHANGEPCTDAY + '%' );
+
+            if ( raw[to].CHANGEPCTDAY > 0 ) {
+                widgetChangePt.addClass( riseClass );
+                widgetChangePt.removeClass( fallClass );
+            } else if ( raw[to].CHANGEPCTDAY < 0 ) {
+                widgetChangePt.addClass( fallClass );
+                widgetChangePt.removeClass( riseClass );
+            } else {
+                widgetChangePt.removeClass( fallClass );
+                widgetChangePt.removeClass( riseClass );
+            }    
 
 
-
-    /*---------------------------
-                                  Google map init
-    ---------------------------*/
-    var map;
-    function googleMap_initialize() {
-        var lat = $('#map_canvas').data('lat');
-        var long = $('#map_canvas').data('lng');
-
-        var mapCenterCoord = new google.maps.LatLng(lat, long);
-        var mapMarkerCoord = new google.maps.LatLng(lat, long);
-
-        var styles = [];
-
-        var mapOptions = {
-            center: mapCenterCoord,
-            zoom: 16,
-            //draggable: false,
-            disableDefaultUI: true,
-            scrollwheel: false,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-
-        map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-
-        var styledMapType=new google.maps.StyledMapType(styles,{name:'Styled'});
-        map.mapTypes.set('Styled',styledMapType);
-        map.setMapTypeId('Styled');
-
-        var markerImage = new google.maps.MarkerImage('images/location.png');
-        var marker = new google.maps.Marker({
-            icon: markerImage,
-            position: mapMarkerCoord, 
-            map: map,
-            title:"Site Title"
-        });
         
-        $(window).resize(function (){
-            map.setCenter(mapCenterCoord);
-        });
+
+
+        //console.log(display);
+
     }
 
-    if ( exist( '#map_canvas' ) ) {
-        googleMap_initialize();
+
+
+    function load_data( pairs ) {
+
+        var from = [];
+        var to = [];
+
+        $.each( pairs, function( index, val ) {
+            from.push( val.from );
+            to.push( val.to );
+        });
+
+        //console.log('dsf')
+        $.ajax({
+            type: 'GET',
+            url: 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=' + from.join() + '&tsyms=' + to.join(),
+            data: null,
+            cache: false,
+            success: function (data, textStatus, jQxhr) {
+                //console.log( data );
+                $.each( pairs, function( index, val ) {
+                    update_widget( val.from, val.to, data.DISPLAY[val.from], data.RAW[val.from] );
+                });
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                console.log(jqXhr);
+            }
+        })
+
     }
+
+
+    setInterval(function(){
+       load_data( pairs );
+    }, 5000);
+
+    load_data( pairs );
 
 }); // end file

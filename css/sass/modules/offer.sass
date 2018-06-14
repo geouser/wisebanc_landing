@@ -13,48 +13,64 @@
 	.container
 		position: relative
 		
-		&:after
-			content: ''
-			position: absolute
-			left: -35px
-			right: -35px
-			height: 490px
-			background-image: url("../images/offer-main.jpg")
-			background-position: 50% 50%
-			background-size: cover
-			background-repeat: no-repeat
-			top: 50%
-			transform: translateY(-50%)
-			z-index: 0 
-			box-shadow: 0px 0px 46px 0px rgba(0,0,0,0.25)
+		.inner
+			position: relative
+			width: 100%
+			max-width: 860px
+			margin: 0 auto 
 			
+			@media (max-width: 991px)
+				max-width: 600px 
 	
 
 	.bonus-offer
 		width: 480px
-		background-color: #FFF
+		background-color: rgba(255, 255, 255, .7)
 		padding: 15px 25px
 		box-shadow: 0px 0px 46px 0px rgba(0,0,0,0.25)
 		position: relative
 		z-index: 1 
 		
+		@media (max-width: 991px)
+			width: 100%
+			
+		@media (max-width: 575px)
+			text-align: center
+			padding: 20px 15px
+		
 
 		.logo
 			width: 140px
-			margin-bottom: 5px 
+			margin-bottom: 15px 
+			@media (max-width: 575px)
+				margin: 0 auto 15px
 			
 			img
 				display: block
 				max-width: 100% 
+				
 			
 		h1
 			font-size: 37.5px 
-			margin-bottom: 5px 
+			margin-bottom: 15px 
+			
+			@media (max-width: 575px)
+				font-size: 32px 
+				
+			@media (max-width: 420px)
+				font-size: 28px 
+			
+			mark
+				color: $primary-color
+				background-color: transparent 
 			
 			
 		h2
 			font-size: 18.75px
 			font-weight: 500 
+			
+			@media (max-width: 575px)
+				font-size: 16px
 			
 		p
 			&:not(:last-child)
@@ -88,6 +104,9 @@
 			position: relative
 			padding: 0 10px
 			
+			@media (max-width: 420px)
+				padding: 0 5px
+			
 			&:not(:last-child)
 				&:after
 					content: ''
@@ -99,35 +118,53 @@
 					transform: translateY(-50%)
 					background-color: #000 
 					
-			&:nth-of-type(1),
+			&:nth-of-type(1)
+				width: 35%
+
 			&:nth-of-type(2)
 				width: 30%	
 				
 			&:nth-of-type(3)
-				width: 40%		
+				width: 35%		
 
 			.label
 				display: block
+				white-space: nowrap
+				margin-bottom: 10px 
+				
+				@media (max-width: 360px)
+					font-size: 12px 
 				
 
 			.value
 				font-weight: 700
-				font-size: 36px  
+				font-size: 24px  
 				white-space: nowrap
+				transition: color 0.3s ease
+				line-height: 1em 
+				display: inline-block
+				
+				@media (max-width: 575px)
+					font-size: 24px 
+					
+				@media (max-width: 420px)
+					font-size: 20px
+					
+				@media (max-width: 360px)
+					font-size: 18px 
+					
+				&.rising
+					color: $success-color
+					
+				&.falling
+					color: $danger-color
+					
 				
 
 
 			.cahnge-percent
 				position: relative
-				display: block
-				padding-left: 20px 
-				
-				&.falling
-					color: $danger-color
-					
-				&.rising
-					color: $success-color
-					
+				padding-left: 20px 				
 
 				&:before
 					content: ''
@@ -140,6 +177,9 @@
 					background-size: auto 100%
 					background-repeat: no-repeat 
 					background-position: 50% 50%
+					
+					@media (max-width: 420px)
+						height: 16px
 					
 				&.falling
 					&:before
@@ -157,7 +197,7 @@
 
 .signup-form
 	width: 310px
-	padding: 15px 25px
+	padding: 20px 30px
 	background-color: #fff
 	box-shadow: 10px 22px 10px 0 rgba(0, 0, 0, 0.1)
 	position: absolute
@@ -170,11 +210,21 @@
 	margin-right: 60px 
 	transition: all 1s ease
 	
+	@media (max-width: 991px)
+		position: static
+		margin-top: 50px
+		transform: none 
+		display: none
+		max-width: 100% 
+		
+	@media (max-width: 420px)
+		padding-left: 0
+		padding-right: 0  
+	
 	&.active
 		opacity: 1
 		visibility: visible
-		margin-right: 0 
-	
+		margin-right: 0
 
 	h3
 		margin-bottom: 30px 
